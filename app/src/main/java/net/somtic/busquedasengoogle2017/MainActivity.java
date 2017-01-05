@@ -65,8 +65,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         entrada = (EditText) findViewById(R.id.EditText01);
         salida = (TextView) findViewById(R.id.TextView01);
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.
-                Builder().permitNetwork().build());
+
     }
 
     public void buscar(View view){
