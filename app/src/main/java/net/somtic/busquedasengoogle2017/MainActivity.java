@@ -1,5 +1,7 @@
 package net.somtic.busquedasengoogle2017;
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +18,45 @@ import java.net.URLEncoder;
 
 public class MainActivity extends AppCompatActivity {
 
+    class BuscarGoogle extends AsyncTask<String, Void, String> {
+
+        private ProgressDialog progreso;
+
+        @Override
+        protected void onPreExecute() {
+            progreso = new ProgressDialog(MainActivity.this);
+            progreso.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progreso.setMessage("Accediendo a Google...");
+            progreso.setCancelable(false);
+            progreso.show();
+        }
+
+        @Override
+        protected String doInBackground(String... palabras) {
+            try {
+                return resultadosGoogle(palabras[0]);
+            } catch(Exception e) {
+                cancel(true);
+                Log.e("HTTP", e.getMessage(), e);
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String res) {
+            progreso.dismiss();
+            salida.append(res + "\n");
+        }
+
+
+        @Override
+        protected void onCancelled() {
+            progreso.dismiss();
+            salida.append("Error al conectar\n");
+        }
+
+    }
+
     private EditText entrada;
     private TextView salida;
     @Override
@@ -29,14 +70,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void buscar(View view){
-        try {
-            String palabras = entrada.getText().toString();
-            String resultado = resultadosGoogle(palabras);
-            salida.append(palabras + "--" + resultado + "\n");
-        } catch (Exception e) {
-            salida.append("Error al conectar\n");
-            Log.e("HTTP", e.getMessage(), e);
-        }
+        String palabras = entrada.getText().toString();
+        salida.append(palabras + "--");
+        new BuscarGoogle().execute(palabras);
     }
 
     String resultadosGoogle(String palabras) throws Exception {
